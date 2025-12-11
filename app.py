@@ -19,9 +19,10 @@ st.write('請上傳一張八哥照片，或從範例中選擇。')
 # CSS: 按鈕改為有框、小尺寸、圓角的樣式（僅調整外觀）
 st.markdown("""
 <style>
-.stButton>button { border: 1px solid #d1d5db !important; background: #f8fafc !important; color: #111827 !important; padding: 4px 8px !important; font-size: 12px !important; border-radius: 6px !important; }
-.stButton>button:hover { background: #eef2f6 !important; }
-.stButton>button:focus { outline: none !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important; }
+/* 黑底白框白字按鈕樣式（僅外觀調整） */
+.stButton>button { border: 1px solid #ffffff !important; background: #000000 !important; color: #ffffff !important; padding: 6px 10px !important; font-size: 12px !important; border-radius: 6px !important; }
+.stButton>button:hover { background: #111111 !important; }
+.stButton>button:focus { outline: none !important; box-shadow: 0 0 0 3px rgba(255,255,255,0.12) !important; }
 </style>
 """, unsafe_allow_html=True)
 
