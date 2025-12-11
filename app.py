@@ -185,9 +185,10 @@ with right_col:
                 # 使用 Altair 畫淺綠色橫向長條圖（類別放在 Y 軸，為橫式顯示）
                 try:
                     df = pd.DataFrame({'label': labels, 'prob': preds})
+                    # 直式長條並依機率排序（由大到小）
                     chart = alt.Chart(df).mark_bar(color="#91C186").encode(
-                        y=alt.Y('label:N', sort=None, title='類別'),
-                        x=alt.X('prob:Q', title='機率')
+                        x=alt.X('label:N', sort=alt.EncodingSortField(field='prob', order='descending'), title='類別'),
+                        y=alt.Y('prob:Q', title='機率')
                     ).properties(width='container')
                     st.altair_chart(chart, use_container_width=True)
                 except Exception:
