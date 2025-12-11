@@ -107,8 +107,8 @@ with left_col:
     total = len(sample_images)
     total_pages = (total + page_size - 1) // page_size if total > 0 else 1
 
-    # 標題放在第一行
-    st.markdown('### 範例畫廊')
+    # 標題放在第一行（改文字）
+    st.markdown('### 範例圖片預覽')
 
     # 頁數與翻頁按鈕放在第二行，頁數字體縮小
     pcol1, pcol2, pcol3 = st.columns([1, 2, 1])
@@ -118,7 +118,7 @@ with left_col:
     with pcol2:
         # 使用更小字體顯示頁數（內嵌 HTML）
         cur = st.session_state['gallery_page'] + 1
-        st.markdown(f"<div style='text-align:center;font-size:12px;color:var(--secondary-text-color)'>第 {cur} / {total_pages} 頁</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align:center;font-size:14px;color:var(--secondary-text-color)'>第 {cur} / {total_pages} 頁</div>", unsafe_allow_html=True)
     with pcol3:
         if st.button('下一頁') and st.session_state['gallery_page'] < total_pages - 1:
             st.session_state['gallery_page'] += 1
