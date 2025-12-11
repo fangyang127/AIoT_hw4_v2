@@ -4,6 +4,10 @@
 --
 這個專案為一個簡單的八哥 (myna) 影像分類範例，包含資料載入、可選的 Data Augmentation、使用 ResNet50V2 進行特徵擷取並加上輸出分類層的訓練腳本；另外提供以 Streamlit 實作的推論介面 `app.py`。
 
+線上 Demo
+--
+- 可透過以下網址直接試用本專案的 Streamlit 應用： [https://aiot-hw4-7114056047.streamlit.app/](https://aiot-hw4-7114056047.streamlit.app/)
+
 參考資料
 --
 - 本專案部分功能與介面設計參考： https://github.com/yenlung/AI-Demo
