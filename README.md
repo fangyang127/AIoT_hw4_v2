@@ -65,3 +65,7 @@ streamlit run app.py
 作者
 --
 範例作業專案（由使用者提供影像資料與需求）。
+
+參考資料
+--
+- 本專案部分功能與介面設計參考： https://github.com/yenlung/AI-Demo
