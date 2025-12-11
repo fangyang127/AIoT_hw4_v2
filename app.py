@@ -136,8 +136,8 @@ with left_col:
             with col:
                 st.image(thumb, use_column_width=True)
                 btn_key = f'btn_sample_{i}'
-                # 使用小圖示按鈕（無框）作為選取
-                if st.button('🔘', key=btn_key):
+                # 使用無框小按鈕作為選取（改為顯示文字「選擇」）
+                if st.button('選擇', key=btn_key):
                     st.session_state['selected_example'] = img_path
                     use_example = img_path
         except Exception:
