@@ -182,12 +182,12 @@ with right_col:
                 st.subheader('預測結果')
                 for r in rows:
                     st.write(f"{r['label']}: {r['prob']:.4f}")
-                # 使用 Altair 畫淺綠色長條圖
+                # 使用 Altair 畫淺綠色橫向長條圖（類別放在 Y 軸，為橫式顯示）
                 try:
                     df = pd.DataFrame({'label': labels, 'prob': preds})
-                    chart = alt.Chart(df).mark_bar(color='#90EE90').encode(
-                        x=alt.X('label:N', sort=None, title='類別'),
-                        y=alt.Y('prob:Q', title='機率')
+                    chart = alt.Chart(df).mark_bar(color="#91C186").encode(
+                        y=alt.Y('label:N', sort=None, title='類別'),
+                        x=alt.X('prob:Q', title='機率')
                     ).properties(width='container')
                     st.altair_chart(chart, use_container_width=True)
                 except Exception:
