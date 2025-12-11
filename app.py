@@ -1,5 +1,7 @@
 import streamlit as st
 import numpy as np
+import pandas as pd
+import altair as alt
 from PIL import Image
 import os
 import base64
@@ -180,7 +182,16 @@ with right_col:
                 st.subheader('預測結果')
                 for r in rows:
                     st.write(f"{r['label']}: {r['prob']:.4f}")
-                st.bar_chart(np.array(preds))
+                # 使用 Altair 畫淺綠色長條圖
+                try:
+                    df = pd.DataFrame({'label': labels, 'prob': preds})
+                    chart = alt.Chart(df).mark_bar(color='#90EE90').encode(
+                        x=alt.X('label:N', sort=None, title='類別'),
+                        y=alt.Y('prob:Q', title='機率')
+                    ).properties(width='container')
+                    st.altair_chart(chart, use_container_width=True)
+                except Exception:
+                    st.bar_chart(np.array(preds))
 
 st.sidebar.markdown('---')
 st.sidebar.write('設定')
