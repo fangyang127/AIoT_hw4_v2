@@ -65,15 +65,36 @@ for cat in categories:
         for fname in os.listdir(d):
             sample_images.append(os.path.join(d, fname))
 
-col1, col2 = st.columns([1, 1])
+# 單欄顯示：上傳或選範例（移除右側模型輸出欄位）
+if 'selected_example' not in st.session_state:
+    st.session_state['selected_example'] = '(無)'
 
-with col1:
-    uploaded = st.file_uploader('上傳圖片', type=['png', 'jpg', 'jpeg'])
-    use_example = st.selectbox('或選擇範例', ['(無)'] + sample_images)
+uploaded = st.file_uploader('上傳圖片', type=['png', 'jpg', 'jpeg'])
+use_example = st.selectbox('或選擇範例', ['(無)'] + sample_images, index=0)
 
-with col2:
-    st.write('模型輸出')
-    placeholder = st.empty()
+# 範例縮圖畫廊（最多顯示 12 張，小圖＋按鈕來選擇）
+st.markdown('### 範例畫廊（點按按鈕以選為範例）')
+cols = st.columns(4)
+max_show = min(len(sample_images), 12)
+for i in range(max_show):
+    img_path = sample_images[i]
+    col = cols[i % 4]
+    try:
+        thumb = Image.open(img_path).convert('RGB')
+        thumb.thumbnail((160, 160))
+        with col:
+            st.image(thumb, use_column_width=True)
+            btn_key = f'btn_sample_{i}'
+            if st.button(os.path.basename(img_path), key=btn_key):
+                st.session_state['selected_example'] = img_path
+                use_example = img_path
+    except Exception:
+        # 跳過讀取失敗的檔案
+        pass
+
+# 若畫廊有點選，優先使用 session_state 的選擇
+if st.session_state.get('selected_example') and st.session_state['selected_example'] != '(無)':
+    use_example = st.session_state['selected_example']
 
 img_to_classify = None
 if uploaded is not None:
