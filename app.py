@@ -2,6 +2,9 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 import os
+import base64
+import io
+import urllib.parse
 import tensorflow as tf
 from tensorflow.keras.applications.resnet_v2 import preprocess_input
 
@@ -65,6 +68,16 @@ for cat in categories:
         for fname in os.listdir(d):
             sample_images.append(os.path.join(d, fname))
 
+# 若 URL 有 query param selected，將其轉成選擇的範例
+params = st.experimental_get_query_params()
+if 'selected' in params:
+    try:
+        sel_idx = int(params.get('selected')[0])
+        if 0 <= sel_idx < len(sample_images):
+            st.session_state['selected_example'] = sample_images[sel_idx]
+    except Exception:
+        pass
+
 # 兩欄佈局：左欄放上傳與畫廊，右欄顯示輸入影像與預測結果
 left_col, right_col = st.columns([1, 1])
 
@@ -102,14 +115,15 @@ with pcol3:
         img_path = sample_images[i]
         col = cols[idx_in % 4]
         try:
-            thumb = Image.open(img_path).convert('RGB')
-            thumb.thumbnail(thumb_size)
+            with open(img_path, 'rb') as f:
+                img_bytes = f.read()
+            b64 = base64.b64encode(img_bytes).decode('utf-8')
+            ext = os.path.splitext(img_path)[1].lower()
+            mime = 'image/png' if ext == '.png' else 'image/jpeg'
+            # 使用 data URI 與 query param（selected=index）建立可點擊縮圖
+            html = f"<a href='?selected={i}'><img src='data:{mime};base64,{b64}' width='{thumb_size[0]}'/></a>"
             with col:
-                st.image(thumb, use_column_width=True)
-                btn_key = f'btn_sample_{i}'
-                if st.button(os.path.basename(img_path), key=btn_key):
-                    st.session_state['selected_example'] = img_path
-                    use_example = img_path
+                st.markdown(html, unsafe_allow_html=True)
         except Exception:
             pass
 
