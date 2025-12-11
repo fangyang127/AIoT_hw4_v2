@@ -16,6 +16,15 @@ st.set_page_config(page_title='八哥辨識器 (Streamlit)', layout='centered')
 st.title('八哥辨識器')
 st.write('請上傳一張八哥照片，或從範例中選擇。')
 
+# CSS: 使按鈕顯示為無框、尺寸較小的樣式（影響全域按鈕）
+st.markdown("""
+<style>
+.stButton>button { border: none !important; background: transparent !important; padding: 2px 6px !important; font-size: 12px !important; }
+.stButton>button:hover { background: rgba(0,0,0,0.03) !important; }
+.stButton>button:focus { outline: none !important; box-shadow:none !important; }
+</style>
+""", unsafe_allow_html=True)
+
 # 讀取類別名稱
 categories = 'crested_myna,javan_myna,common_myna'.split(',')
 labels = '土八哥,白尾八哥,家八哥'.split(',')
@@ -120,7 +129,8 @@ with pcol3:
             with col:
                 st.image(thumb, use_column_width=True)
                 btn_key = f'btn_sample_{i}'
-                if st.button('選取', key=btn_key):
+                # 使用小圖示按鈕（無框）作為選取
+                if st.button('🔘', key=btn_key):
                     st.session_state['selected_example'] = img_path
                     use_example = img_path
         except Exception:
