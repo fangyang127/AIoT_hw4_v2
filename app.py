@@ -72,16 +72,34 @@ if 'selected_example' not in st.session_state:
 uploaded = st.file_uploader('上傳圖片', type=['png', 'jpg', 'jpeg'])
 use_example = st.selectbox('或選擇範例', ['(無)'] + sample_images, index=0)
 
-# 範例縮圖畫廊（最多顯示 12 張，小圖＋按鈕來選擇）
-st.markdown('### 範例畫廊（點按按鈕以選為範例）')
+# 範例縮圖畫廊（分頁顯示與縮小縮圖）
+page_size = 12
+if 'gallery_page' not in st.session_state:
+    st.session_state['gallery_page'] = 0
+
+total = len(sample_images)
+total_pages = (total + page_size - 1) // page_size if total > 0 else 1
+
+pcol1, pcol2, pcol3 = st.columns([1, 2, 1])
+with pcol1:
+    if st.button('上一頁') and st.session_state['gallery_page'] > 0:
+        st.session_state['gallery_page'] -= 1
+with pcol2:
+    st.markdown(f"### 範例畫廊（第 {st.session_state['gallery_page']+1} / {total_pages} 頁）")
+with pcol3:
+    if st.button('下一頁') and st.session_state['gallery_page'] < total_pages - 1:
+        st.session_state['gallery_page'] += 1
+
+start = st.session_state['gallery_page'] * page_size
+end = min(start + page_size, total)
 cols = st.columns(4)
-max_show = min(len(sample_images), 12)
-for i in range(max_show):
+thumb_size = (100, 100)
+for idx_in, i in enumerate(range(start, end)):
     img_path = sample_images[i]
-    col = cols[i % 4]
+    col = cols[idx_in % 4]
     try:
         thumb = Image.open(img_path).convert('RGB')
-        thumb.thumbnail((160, 160))
+        thumb.thumbnail(thumb_size)
         with col:
             st.image(thumb, use_column_width=True)
             btn_key = f'btn_sample_{i}'
@@ -89,7 +107,6 @@ for i in range(max_show):
                 st.session_state['selected_example'] = img_path
                 use_example = img_path
     except Exception:
-        # 跳過讀取失敗的檔案
         pass
 
 # 若畫廊有點選，優先使用 session_state 的選擇
