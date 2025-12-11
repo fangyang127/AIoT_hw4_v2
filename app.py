@@ -98,23 +98,24 @@ with left_col:
     uploaded = st.file_uploader('上傳圖片', type=['png', 'jpg', 'jpeg'])
     use_example = st.selectbox('或選擇範例', ['(無)'] + sample_images, index=0)
 
-# 範例縮圖畫廊（分頁顯示與縮小縮圖）
-page_size = 12
-if 'gallery_page' not in st.session_state:
-    st.session_state['gallery_page'] = 0
+# 範例縮圖畫廊（分頁顯示與縮小縮圖），放到左欄
+with left_col:
+    page_size = 12
+    if 'gallery_page' not in st.session_state:
+        st.session_state['gallery_page'] = 0
 
-total = len(sample_images)
-total_pages = (total + page_size - 1) // page_size if total > 0 else 1
+    total = len(sample_images)
+    total_pages = (total + page_size - 1) // page_size if total > 0 else 1
 
-pcol1, pcol2, pcol3 = st.columns([1, 2, 1])
-with pcol1:
-    if st.button('上一頁') and st.session_state['gallery_page'] > 0:
-        st.session_state['gallery_page'] -= 1
-with pcol2:
-    st.markdown(f"### 範例畫廊（第 {st.session_state['gallery_page']+1} / {total_pages} 頁）")
-with pcol3:
-    if st.button('下一頁') and st.session_state['gallery_page'] < total_pages - 1:
-        st.session_state['gallery_page'] += 1
+    pcol1, pcol2, pcol3 = st.columns([1, 2, 1])
+    with pcol1:
+        if st.button('上一頁') and st.session_state['gallery_page'] > 0:
+            st.session_state['gallery_page'] -= 1
+    with pcol2:
+        st.markdown(f"### 範例畫廊（第 {st.session_state['gallery_page']+1} / {total_pages} 頁）")
+    with pcol3:
+        if st.button('下一頁') and st.session_state['gallery_page'] < total_pages - 1:
+            st.session_state['gallery_page'] += 1
 
     start = st.session_state['gallery_page'] * page_size
     end = min(start + page_size, total)
