@@ -115,15 +115,14 @@ with pcol3:
         img_path = sample_images[i]
         col = cols[idx_in % 4]
         try:
-            with open(img_path, 'rb') as f:
-                img_bytes = f.read()
-            b64 = base64.b64encode(img_bytes).decode('utf-8')
-            ext = os.path.splitext(img_path)[1].lower()
-            mime = 'image/png' if ext == '.png' else 'image/jpeg'
-            # 使用 data URI 與 query param（selected=index）建立可點擊縮圖
-            html = f"<a href='?selected={i}'><img src='data:{mime};base64,{b64}' width='{thumb_size[0]}'/></a>"
+            thumb = Image.open(img_path).convert('RGB')
+            thumb.thumbnail(thumb_size)
             with col:
-                st.markdown(html, unsafe_allow_html=True)
+                st.image(thumb, use_column_width=True)
+                btn_key = f'btn_sample_{i}'
+                if st.button('選取', key=btn_key):
+                    st.session_state['selected_example'] = img_path
+                    use_example = img_path
         except Exception:
             pass
 
