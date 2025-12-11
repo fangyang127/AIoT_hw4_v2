@@ -7,6 +7,7 @@ from tensorflow.keras.applications.resnet_v2 import preprocess_input
 
 # 設定
 BASE_DIR = 'myna'
+MODEL_PATH = 'myna_model.h5'
 
 st.set_page_config(page_title='八哥辨識器 (Streamlit)', layout='centered')
 st.title('八哥辨識器')
@@ -17,17 +18,26 @@ categories = 'crested_myna,javan_myna,common_myna'.split(',')
 labels = '土八哥,白尾八哥,家八哥'.split(',')
 N = len(categories)
 
-# 嘗試載入模型
-MODEL_PATH = 'myna_model.h5'
-model = None
-if os.path.exists(MODEL_PATH):
-    try:
-        model = tf.keras.models.load_model(MODEL_PATH)
-        st.success('已載入模型：' + MODEL_PATH)
-    except Exception as e:
-        st.error(f'載入模型失敗：{e}')
+
+@st.cache_resource
+def load_model():
+    """快取模型載入，避免每次重新載入"""
+    if os.path.exists(MODEL_PATH):
+        try:
+            model = tf.keras.models.load_model(MODEL_PATH)
+            return model, True, None
+        except Exception as e:
+            return None, False, str(e)
+    else:
+        return None, False, '找不到模型檔 myna_model.h5'
+
+
+# 載入模型
+model, model_loaded, load_error = load_model()
+if model_loaded:
+    st.success('✓ 已載入模型：' + MODEL_PATH)
 else:
-    st.warning('找不到模型檔 myna_model.h5，請先執行訓練腳本並產生模型。')
+    st.warning('⚠ 載入模型失敗：' + (load_error or '未知錯誤'))
 
 
 def load_and_preprocess(image: Image.Image):
@@ -40,10 +50,10 @@ def load_and_preprocess(image: Image.Image):
 
 
 def predict(img: Image.Image):
-    if model is None:
+    if not model_loaded or model is None:
         return None
     x = load_and_preprocess(img)
-    pred = model.predict(x).flatten()
+    pred = model.predict(x, verbose=0).flatten()
     return pred
 
 
@@ -78,20 +88,23 @@ elif use_example and use_example != '(無)':
 
 if img_to_classify is not None:
     st.image(img_to_classify, caption='輸入影像', use_column_width=True)
-    preds = predict(img_to_classify)
-    if preds is None:
+    if not model_loaded:
         st.error('模型尚未載入，無法預測。')
     else:
-        # 顯示前 N 項結果
-        top_idx = preds.argsort()[::-1][:N]
-        rows = []
-        for idx in top_idx:
-            rows.append({'label': labels[idx], 'prob': float(preds[idx])})
-        # 輸出成表格與長條圖
-        st.subheader('預測結果')
-        for r in rows:
-            st.write(f"{r['label']}: {r['prob']:.4f}")
-        st.bar_chart(np.array(preds))
+        preds = predict(img_to_classify)
+        if preds is None:
+            st.error('預測失敗。')
+        else:
+            # 顯示前 N 項結果
+            top_idx = preds.argsort()[::-1][:N]
+            rows = []
+            for idx in top_idx:
+                rows.append({'label': labels[idx], 'prob': float(preds[idx])})
+            # 輸出成表格與長條圖
+            st.subheader('預測結果')
+            for r in rows:
+                st.write(f"{r['label']}: {r['prob']:.4f}")
+            st.bar_chart(np.array(preds))
 
 st.sidebar.markdown('---')
 st.sidebar.write('設定')
